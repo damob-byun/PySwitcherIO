@@ -8,12 +8,13 @@
 
 ```python
 #1구의 경우
-import PySwitcherIO
-io = PySwitcherIO.IOSwitcher("XX:XX:XX:XX:XX:XX", 1)
+import pyswitcherio
+io = pyswitcherio.IOSwitcher("XX:XX:XX:XX:XX:XX", 1)
 io.turn_on()
 io.turn_off()
 #2구의 경우
-io = IOSwitcher("XX:XX:XX:XX:XX:XX", 2)
+import pyswitcherio
+io = pyswitcherio.IOSwitcher("XX:XX:XX:XX:XX:XX", 2)
 io.turn_on()
 io.turn_off()
 ```
