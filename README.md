@@ -8,7 +8,8 @@
 
 ```python
 #1구의 경우
-io = IOSwitcher("XX:XX:XX:XX:XX:XX", 1)
+import PySwitcherIO
+io = PySwitcherIO.IOSwitcher("XX:XX:XX:XX:XX:XX", 1)
 io.turn_on()
 io.turn_off()
 #2구의 경우
@@ -19,7 +20,7 @@ io.turn_off()
 
 ## Installation
 
-... 준비중
+pip install PySwitcherIO==0.0.1
 
 ## License
 
