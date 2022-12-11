@@ -4,7 +4,7 @@ setup(
     name='PySwitcherIO',
     packages=['pyswitcherio'],
     install_requires=['bleak'],
-    version='0.0.2',
+    version='0.0.3',
     description='IOSwitcher in korea',
     author='Damob.byun',
     url='https://github.com/damob-byun/PySwitcherIO',

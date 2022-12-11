@@ -3,6 +3,7 @@
 ## 스위처(https://try.i-o.studio/#/) 제품을 파이썬으로 컨트롤 하는 코드입니다.
 
 누군가 만들기를 기다렸는데... 결국 참다 못해 만든 파이썬 라이브러리.
+bluepy -> bleak 
 
 ## Example
 
@@ -21,7 +22,7 @@ io.turn_off()
 
 ## Installation
 
-pip install PySwitcherIO==0.0.1
+pip install PySwitcherIO==0.0.3
 
 ## License
 

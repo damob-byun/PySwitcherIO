@@ -82,13 +82,13 @@ class IOSwitcher:
         finally:
             self._client = None
 
-    def turn_on(self) -> bool:
+    async def turn_on(self) -> bool:
         """불을 켭니다."""
-        return self._sendcommand(self._on_key, self._retry_count)
+        return await self._sendcommand(self._on_key, self._retry_count)
 
-    def turn_off(self) -> bool:
+    async def turn_off(self) -> bool:
         """불을 끕니다."""
-        return self._sendcommand(self._off_key, self._retry_count)
+        return await self._sendcommand(self._off_key, self._retry_count)
 
     def _commandkey(self, key) -> str:
         # 여기다 타입별로 명령어 추가
@@ -135,6 +135,6 @@ class IOSwitcher:
 
 
 if __name__ == "__main__":
-    switcher = IOSwitcher("AC9A3E77-F6CC-193D-CB10-8D980486B717", 1)
+    switcher = IOSwitcher("C8:11:9E:29:CA:57", 1)
     # asyncio.run(switcher.run())
     asyncio.run(switcher.turn_on())
