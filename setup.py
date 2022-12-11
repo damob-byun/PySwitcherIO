@@ -1,11 +1,11 @@
 from setuptools import setup
 
 setup(
-    name = 'PySwitcherIO',
-    packages = ['pyswitcherio'],
-    install_requires=['bluepy'],
-    version = '0.0.1',
-    description = 'IOSwitcher in korea',
+    name='PySwitcherIO',
+    packages=['pyswitcherio'],
+    install_requires=['bleak'],
+    version='0.0.2',
+    description='IOSwitcher in korea',
     author='Damob.byun',
     url='https://github.com/damob-byun/PySwitcherIO',
     license='MIT',
@@ -17,5 +17,5 @@ setup(
         'Programming Language :: Python',
         'Topic :: Home Automation',
         'Topic :: Software Development :: Libraries :: Python Modules'
-        ]
+    ]
 )
