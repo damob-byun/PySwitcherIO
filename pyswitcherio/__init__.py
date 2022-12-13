@@ -112,7 +112,7 @@ class IOSwitcher:
             )
             return False
         _LOGGER.warning("스위쳐 연결 실패. 다시 시도 남은 횟수 %d", retry)
-        time.sleep(DEFAULT_RETRY_TIMEOUT)
+        asyncio.sleep(DEFAULT_RETRY_TIMEOUT)
         return await self._sendcommand(key, retry - 1)
 
     async def _writekey(self, key) -> bool:
