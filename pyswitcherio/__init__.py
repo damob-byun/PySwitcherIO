@@ -3,9 +3,17 @@ import sys
 import time
 import binascii
 import logging
-from bleak import BleakClient
+from bleak.backends.device import BLEDevice
 import asyncio
 from bleak import BleakScanner
+from bleak import BleakClient
+from bleak_retry_connector import (
+    BLEAK_RETRY_EXCEPTIONS,
+    BleakClientWithServiceCache,
+    BleakNotFoundError,
+    ble_device_has_changed,
+    establish_connection,
+)
 DEFAULT_RETRY_COUNT = 5
 DEFAULT_RETRY_TIMEOUT = 1
 
@@ -24,10 +32,16 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class IOSwitcher:
-    def __init__(self, mac, type=1, **kwargs) -> None:
+    def __init__(self, mac, device: BLEDevice, type=1,  **kwargs) -> None:
         """IO 스위쳐 초기화."""
         self._mac = mac.lower()
-        self._client = None
+        #self._device: BLEDevice | None = None
+        if device is None:
+            self._device = asyncio.run(
+                BleakScanner.find_device_by_address(self._mac))
+        else:
+            self._device = device
+        self._client: BleakClient | None = None
         self._char_uuid = None
         self._retry_count = DEFAULT_RETRY_COUNT
         if type == 2:
@@ -38,32 +52,18 @@ class IOSwitcher:
             self._off_key = OFF_KEY1
 
     async def _connect(self) -> None:
-        if self._client is not None:
+        if self._client is not None and self._client.is_connected():
             return
         try:
             _LOGGER.debug("스위쳐 연결 중")
-            self._client = BleakClient(self._mac)
+            self._client = BleakClient(self._device, self._disconnected)
+
             await self._client.connect()
 
             services = await self._client.get_services()
             for service in services:
-                # print(service)
-                # 서비스의 UUID 출력
-                #print('\tuuid:', service.uuid)
                 if service.uuid == UUID:
                     self._char_uuid = service.characteristics[0].uuid
-                #print('\tcharacteristic list:')
-                # 서비스의 모든 캐릭터리스틱 출력용
-                # for characteristic in service.characteristics:
-                    # 캐릭터리스틱 클래스 변수 전체 출력
-                #    print('\t\t', characteristic)
-                    # UUID
-                 #   print('\t\tuuid:', characteristic.uuid)
-                    # decription(캐릭터리스틱 설명)
-                 #   print('\t\tdescription :', characteristic.description)
-                    # 캐릭터리스틱의 속성 출력
-                    # 속성 값 : ['write-without-response', 'write', 'read', 'notify']
-                 #   print('\t\tproperties :', characteristic.properties)
 
             _LOGGER.debug("스위쳐 연결 완료!")
         except Exception as e:
@@ -133,8 +133,26 @@ class IOSwitcher:
             print(d)
             print(d.address)
 
+    def _disconnected(self, client: BleakClientWithServiceCache) -> None:
+        """Disconnected callback."""
+        if self._expected_disconnect:
+            _LOGGER.debug(
+                "%s: Disconnected from device; mac: %s", self.name, self._mac
+            )
+            return
+        _LOGGER.warning(
+            "%s: Device unexpectedly disconnected; mac: %s",
+            self.name,
+            self._mac,
+        )
+
+    @property
+    def name(self) -> str:
+        """Return device name."""
+        return f"{self._device.name} ({self._device.address})"
+
 
 if __name__ == "__main__":
-    switcher = IOSwitcher("C8:11:9E:29:CA:57", 1)
+    switcher = IOSwitcher("xx:xx:xx:xx:xx:xx", None, 1)
     # asyncio.run(switcher.run())
     asyncio.run(switcher.turn_on())
