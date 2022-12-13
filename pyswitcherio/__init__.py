@@ -56,7 +56,7 @@ class IOSwitcher:
             return
         try:
             _LOGGER.debug("스위쳐 연결 중")
-            self._client = BleakClient(self._device, self._disconnected)
+            self._client = BleakClient(self._device)
 
             await self._client.connect()
 
