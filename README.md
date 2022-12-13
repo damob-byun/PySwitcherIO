@@ -22,7 +22,7 @@ io.turn_off()
 
 ## Installation
 
-pip install PySwitcherIO==0.0.3
+pip install PySwitcherIO==0.0.4
 
 ## License
 
