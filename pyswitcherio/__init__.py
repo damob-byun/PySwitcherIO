@@ -1,5 +1,4 @@
 import sys
-
 import time
 import binascii
 import logging
@@ -27,12 +26,11 @@ OFF_KEY2 = binascii.a2b_hex("03")
 
 UUID = "0000150b-0000-1000-8000-00805f9b34fb"
 
-
 _LOGGER = logging.getLogger(__name__)
 
 
 class IOSwitcher:
-    def __init__(self, mac, device: BLEDevice, type=1,  **kwargs) -> None:
+    def __init__(self, mac, device: BLEDevice, type=1, char_uuid="000015ba-0000-1000-8000-00805f9b34fb", ** kwargs) -> None:
         """IO 스위쳐 초기화."""
         self._mac = mac.lower()
         #self._device: BLEDevice | None = None
@@ -42,7 +40,11 @@ class IOSwitcher:
         else:
             self._device = device
         self._client: BleakClient | None = None
-        self._char_uuid = None
+
+        if char_uuid is None:
+            self._char_uuid = None
+        else:
+            self._char_uuid = char_uuid
         self._retry_count = DEFAULT_RETRY_COUNT
         if type == 2:
             self._on_key = ON_KEY2
@@ -59,12 +61,14 @@ class IOSwitcher:
             self._client = BleakClient(self._device)
 
             await self._client.connect()
-
-            services = await self._client.get_services()
-            for service in services:
-                if service.uuid == UUID:
-                    self._char_uuid = service.characteristics[0].uuid
-
+            if self._char_uuid is None:
+                services = await self._client.get_services()
+                for service in services:
+                    if service.uuid == UUID:
+                        self._char_uuid = service.characteristics[len(
+                            service.characteristics)-1].uuid
+            if self._char_uuid is None:
+                raise Exception("캐릭터리스틱 UUID가 없습니다.")
             _LOGGER.debug("스위쳐 연결 완료!")
         except Exception as e:
             _LOGGER.debug("스위쳐 연결 실패", e, exc_info=True)
@@ -112,7 +116,7 @@ class IOSwitcher:
             )
             return False
         _LOGGER.warning("스위쳐 연결 실패. 다시 시도 남은 횟수 %d", retry)
-        asyncio.sleep(DEFAULT_RETRY_TIMEOUT)
+        await asyncio.sleep(DEFAULT_RETRY_TIMEOUT)
         return await self._sendcommand(key, retry - 1)
 
     async def _writekey(self, key) -> bool:
@@ -153,6 +157,6 @@ class IOSwitcher:
 
 
 if __name__ == "__main__":
-    switcher = IOSwitcher("xx:xx:xx:xx:xx:xx", None, 1)
+    switcher = IOSwitcher("C8:11:9E:29:CA:57", None, 1)
     # asyncio.run(switcher.run())
-    asyncio.run(switcher.turn_on())
+    asyncio.run(switcher.turn_off())
